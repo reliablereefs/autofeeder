@@ -1,3 +1,5 @@
 [autofeeder]
 wifi_ssid = "FIXME"
 wifi_psk = "FIXME"
+syslog_host = "127.0.0.1"
+syslog_port = 514
