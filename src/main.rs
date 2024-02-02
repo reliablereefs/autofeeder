@@ -22,9 +22,8 @@ use esp_idf_svc::wifi::WifiDeviceId;
 use wifi::wifi;
 use serde::{Deserialize, Serialize};
 use serde_json;
-use byteorder::{ReadBytesExt};
-use std::io::{Seek};
 use chrono::Utc;
+use esp_syslog;
 
 mod ntp;
 
@@ -87,6 +86,8 @@ fn main() -> Result<()> {
             bail!("Could not connect to Wi-Fi network: {:?}", err)
         }
     };
+    let mac_hex = mac.iter().map(|b| format!("{:02x}", b)).collect::<String>();
+    let hostname = format!("esp32-{}", mac_hex);
 
     // sync ntp
     ntp::ntp_sync()?;
@@ -97,6 +98,16 @@ fn main() -> Result<()> {
     client.send(b"hello world")?;
 
     info!("Sent some data to a udp port!");
+
+    esp_syslog::init_udp(
+        SocketAddr::new("127.0.0.1".parse()?, 1514),
+        address,
+        hostname,
+        esp_syslog::Facility::LOG_USER,
+        log::LevelFilter::Info,
+        "main".to_string(),
+        0,
+    ).unwrap();
 
     // initialize the groups
     let mut devices: HashMap<String, DoseDevice> = HashMap::new();

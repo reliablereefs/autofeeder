@@ -1,7 +1,7 @@
-use std::io::{Cursor, SeekFrom};
+use std::io::{Cursor, Seek, SeekFrom};
 use std::ptr::null;
 use std::time::Duration;
-use byteorder::BigEndian;
+use byteorder::{BigEndian, ReadBytesExt};
 use esp_idf_sys::{settimeofday, time_t, timeval};
 use log::{error, info};
 
